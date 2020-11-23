@@ -13,13 +13,13 @@ pipeline {
         stage('Run Containers') {
           steps {
             echo 'In run container stage'
-            sh 'docker run -d -p 6379:6379 --name myredis redis:alpine'
+            sh 'docker run -p 5000:5000 -d --name myflaskapp_c myflaskapp'
           }
         }
 
         stage('Running flask') {
           steps {
-            sh 'docker run -d -p 5000:5000 --name myflaskapp_c myflaskapp'
+            sh 'docker run -p 6379:6379 -d --name myredis redis:alpine'
           }
         }
 
