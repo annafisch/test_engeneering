@@ -28,7 +28,7 @@ pipeline {
 
     stage('Testing') {
       steps {
-        echo 'In testingstage'
+        echo 'In testing stage'
         sh 'python test_app.py'
       }
     }
