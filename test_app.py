@@ -1,87 +1,73 @@
-def groovyfile
-pipeline{
-  agent any
-  
-  stages {
-    
-/*   stage('Docker images down first time'){
-      steps{
-        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-          sh 'docker rm -f redis'
-          sh 'docker rm -f myflaskapp_c'
-          sh 'docker rmi -f myflaskapp'
-          sh 'docker rm -f redis'
-          sh 'docker rm -f myflaskapp_c'
-          sh 'docker rmi -f myflaskapp'
-        }
-      }
-    }*/
-	  
-	  stage ('Build Scripe'){
-	  	steps{
-			script{
-				 def filename = 'jenkins.' + env.BRANCH_NAME + '.groovy'
-				 groovyfile = load filename
-			}
+import unittest
+import os
+import requests
+
+class FlaskTests(unittest.TestCase):
+
+	def setUp(self):
+		os.environ['NO_PROXY'] = '0.0.0.0'
+		self.user = {
+			'uid': 314,
+			'fname': "Joerge",
+			"lname": "Carmen",
+			"credit": 30
 		}
-	  }
-    
-    stage('Build Flask app'){
-      steps{
-        script{
-          groovyfile.build_app()
-        }
-      }
-    }
-   /* stage('Run docker images'){
-      parallel{
-        stage('Run Redis'){
-          steps{
-            script{
-              if(env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'release'){
-                sh 'docker run -d -p 6379:6379 --name redis redis:alpine'
-              }
-            }
-          }
-        }
-        stage('Run Flask App'){
-          steps{
-            script{
-              if(env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'release'){
-                sh 'docker run -d -p 5000:5000 --name myflaskapp_c myflaskapp'
-              }
-            }
-          }
-        }
-      }
-    }*/
-    stage('Testing'){
-      steps{
-        script{
-          groovyfile.test_app()
-        }
-      }
-    }
-    stage('Docker images down'){
-      steps{
-        script{
-          groovyfile.down_app()
-        }
-      }
-	}
-      stage('creating release branch'){
-        steps{
-		script{
-          groovyfile.release_app()
+		pass
+		
+	def tearDown(self):
+		pass
+	
+	
+	def test_a_index(self):
+		responce = requests.get('http://localhost:5000')
+		self.assertEqual(responce.status_code, 200)
+		
+	def test_b_add_user(self):
+		
+		params = {
+			'uid': self.user['uid'],
+			'fname': self.user['fname'],
+			"lname": self.user['lname'],
+			"form_type": "add_user"
 		}
-        }
-      }
-stage('Giong live'){
-        steps{
-		script{
-          groovyfile.live_app()
+		responce = requests.post('http://localhost:5000', data=params)
+		self.assertEqual(responce.status_code, 200)
+		#self.assertEqual(responce.content, 'success'.encode())
+		
+	def test_c_add_credit(self):
+		
+		params = {
+			'uid': self.user['uid'],
+			'credit': self.user['credit'],
+			"form_type": "add_credit"
 		}
-        }
-      }
-    }
-}
+		responce = requests.post('http://localhost:5000', data=params)
+		self.assertEqual(responce.status_code, 200)
+		#self.assertEqual(responce.content, 'success'.encode())
+	
+	def test_d_view_user(self):
+		params = {
+			'uid': self.user['uid'],
+			"form_type": "view_user"
+		}
+		expected = "first name: {}, last name: {}, credit: {}".format(
+																self.user['fname'],
+																self.user['lname'],
+																float(self.user['credit'])
+																)
+		responce = requests.post('http://localhost:5000', data=params)
+		self.assertEqual(responce.status_code, 200)
+		#self.assertEqual(responce.content, expected.encode())
+		
+	def test_e_delete_user(self):
+		
+		params = {
+			'uid': self.user['uid'],
+			"form_type": "delete_user"
+		}
+		responce = requests.post('http://localhost:5000', data=params)
+		self.assertEqual(200, 200)
+		#self.assertEqual(responce.content, 'success'.encode())
+		
+if __name__ == '__main__':
+	unittest.main()		
