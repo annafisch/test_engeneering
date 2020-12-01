@@ -25,7 +25,7 @@ pipeline{
         sh 'python test_app.py'
       }
     }
-    stage('Stop containers'){
+    stage('Docker images down'){
       steps{
         sh 'docker rm -f redis'
         sh 'docker rm -f myflaskapp_c'
