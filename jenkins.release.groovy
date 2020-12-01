@@ -19,6 +19,19 @@ def down_app(){
 }
 
 def release_app(){
+  echp 'deploy for staging environment'
+}
+
+def accept_app(){
+  input 'processed with live deployment'
+}
+
+def merge_app(){
+  echo 'Merging to master'
+}
+
+def stop_app(){
+  sh 'docker-compose down'
 }
 
 def live_app(){
