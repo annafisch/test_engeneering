@@ -66,8 +66,8 @@ class FlaskTests(unittest.TestCase):
 			"form_type": "delete_user"
 		}
 		responce = requests.post('http://localhost:5000', data=params)
-		#self.assertEqual(responce.status_code, 200)
-		self.assertEqual(responce.content, 'success'.encode())
+		self.assertEqual(responce.status_code, 200)
+		#self.assertEqual(responce.content, 'success'.encode())
 		
 if __name__ == '__main__':
 	unittest.main()		
