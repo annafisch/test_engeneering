@@ -84,3 +84,6 @@ if __name__ == '__main__':
 	
 	redis_client = StrictRedis(host='redis', port=6379)
 	app.run(host='0.0.0.0')
+	
+	
+	
