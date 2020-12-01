@@ -53,6 +53,16 @@ def view_user(uid):
 														)
 	return status
 	
+	
+def delete_user(uid):
+	status = "success"
+	try:
+		redis_client.get(uid)
+	except RedisError:
+		status = "fail"
+	redis_client.delete(uid)
+	return status
+	
 @app.route('/', methods=['GET', 'POST'])
 def index():
 	if request.method == 'POST':
@@ -65,13 +75,12 @@ def index():
 			
 		elif details['form_type'] == 'view_user':
 			return view_user(details['uid'])
+			
+		elif details['form_type'] == 'delete_user':
+			return delete_user(details['uid'])
 	return render_template('index.html')
 
 if __name__ == '__main__':
 	
 	redis_client = StrictRedis(host='redis', port=6379)
 	app.run(host='0.0.0.0')
-	
-	
-	
-	
